@@ -1,0 +1,97 @@
+* {
+  border: none;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  color: #232323;
+  height: 100%;
+  width: 100vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Roboto", sans-serif;
+}
+
+main {
+  height: 100vh;
+  width: 25rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+main h1 {
+  margin-bottom: 2rem;
+}
+main form {
+  width: 100%;
+  display: flex;
+}
+main form input {
+  width: 100%;
+  border-bottom: 1px solid black;
+  margin-right: 2rem;
+  padding: 1rem;
+  outline: none;
+}
+main form button {
+  font-size: x-large;
+  padding: 0.25rem 1rem;
+  border-radius: 15px;
+  background-color: #232323;
+  color: white;
+}
+main form button:hover {
+  cursor: pointer;
+}
+main #taskbox {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin-top: 1.5rem;
+}
+main #taskbox .task {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid grey;
+  height: 3rem;
+  width: 100%;
+  border-radius: 10px;
+  margin-bottom: 1rem;
+}
+main #taskbox .task input {
+  margin-left: 1rem;
+}
+main #taskbox .task input:hover {
+  cursor: pointer;
+}
+main #taskbox .task label {
+  width: 100%;
+  padding: 0 1rem;
+}
+main #taskbox .task button {
+  background-color: white;
+  width: 3rem;
+  height: 100%;
+  border-radius: 0 9px 9px 0;
+}
+main #taskbox .task button:hover {
+  cursor: pointer;
+  background-color: #232323;
+  color: white;
+}
+main #taskbox .task button:active {
+  color: white;
+  background-color: grey;
+}
+main h4 {
+  align-self: flex-start;
+  margin: 1rem 0;
+}
+main p {
+  font-style: italic;
+}/*# sourceMappingURL=style.css.map */

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-Do</title>
+    <link rel="icon" href="/assets/favicon.ico">
+    <link rel="stylesheet" href="/style.css">
+    <!-- fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300..700&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+</head>
+<body>
+    
+    <head></head>
+    <main>
+        <h1>Your To Dos'</h1>
+        <form id="taskForm" autocomplete="off">
+            <input id="inputTask" name="notename" placeholder="Enter your task here..." required>
+            <button type="submit">+</button>
+        </form>
+        <div id="taskbox">
+            <div id="taskbox">
+                <% if (tasks && tasks.length > 0) { %>
+                    <% tasks.forEach(function(task, idx) { %>
+                        <div class="task" data-id="<%= task._id %>">
+                            <input
+                                type="checkbox"
+                                id="task-<%= task._id %>"
+                                name="task-<%= task._id %>"
+                                <%= task.notestatus === "checked" ? "checked" : "" %>
+                            >
+                            <label for="task-<%= task._id %>"><%= task.notename %></label>
+                            <button>✕</button>
+                        </div>
+                    <% }) %>
+                <% } else { %>
+                    <p id="noTasksMsg">No tasks yet!</p>
+                <% } %>
+            </div>
+        </div>
+        <h4>Your remaining todos: <span id="todoCount"><%= tasks ? tasks.length : 0 %></span></h4>
+        <p>"Doing what you love is the cornerstone of having abundance in your life." - Wayne Dyer</p>
+    </main>
+
+    <script>
+        // Helper to update the todo count
+        function updateTodoCount() {
+            const count = document.querySelectorAll('#taskbox .task').length;
+            document.getElementById('todoCount').textContent = count;
+        }
+
+        document.getElementById('taskbox').addEventListener('change', async function(e) {
+            if (e.target && e.target.matches('input[type="checkbox"]')) {
+                const taskDiv = e.target.closest('.task');
+                const id = taskDiv.getAttribute('data-id');
+                const notestatus = e.target.checked ? "checked" : "unchecked";
+                await fetch(`/api/task/${id}/status`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ notestatus })
+                });
+                // Optionally, handle errors or UI feedback here
+            }
+        });
+        // Remove task on button click
+        document.getElementById('taskbox').addEventListener('click', async function(e) {
+            if (e.target && e.target.tagName === 'BUTTON') {
+                const taskDiv = e.target.closest('.task');
+                const id = taskDiv.getAttribute('data-id');
+                const res = await fetch(`/api/removeTask/${id}`, {
+                    method: 'DELETE'
+                });
+                if (res.ok) {
+                    taskDiv.remove();
+                    updateTodoCount();
+                    // If no tasks left, show the "No tasks yet!" message
+                    if (document.querySelectorAll('#taskbox .task').length === 0) {
+                        const msg = document.createElement('p');
+                        msg.id = 'noTasksMsg';
+                        msg.textContent = 'No tasks yet!';
+                        document.getElementById('taskbox').appendChild(msg);
+                    }
+                } else {
+                    alert('Failed to remove task');
+                }
+            }
+        });
+        document.getElementById('taskForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const input = document.getElementById('inputTask');
+            const notename = input.value.trim();
+            if (!notename) return;
+
+            const res = await fetch('/api/addTask', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ notename })
+            });
+
+            if (res.ok) {
+                input.value = '';
+                const data = await res.json();
+
+                // Remove "No tasks yet!" message if present
+                const noTasksMsg = document.getElementById('noTasksMsg');
+                if (noTasksMsg) noTasksMsg.remove();
+
+                // Add the new task to the DOM
+                const taskbox = document.getElementById('taskbox');
+                const div = document.createElement('div');
+                div.className = 'task';
+                div.setAttribute('data-id', data.task ? data.task._id : Date.now());
+                div.innerHTML = `
+                    <input type="checkbox" id="task-${data.task ? data.task._id : Date.now()}" name="task-${data.task ? data.task._id : Date.now()}">
+                    <label for="task-${data.task ? data.task._id : Date.now()}">${notename}</label>
+                    <button>✕</button>
+                `;
+                taskbox.appendChild(div);
+                // Update the todo count dynamically
+                updateTodoCount();
+            } else {
+                alert('Failed to add task');
+            }
+        });
+    </script>
+
+</body>
+</html>
